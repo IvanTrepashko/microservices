@@ -1,0 +1,17 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/test",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:ApiGateway}"
+        }
+      ],
+      "UpstreamPathTemplate": "/test",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    }
+  ]
+}

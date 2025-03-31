@@ -1,0 +1,24 @@
+{
+  "GlobalConfiguration": {
+    "ClusterServiceNames": {
+      "AuthenticationService": "http://localhost:5001",
+      "ApiGateway": "http://localhost:5099"
+    }
+  },
+  "Aggregates": [],
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/test",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:ApiGateway}"
+        }
+      ],
+      "UpstreamPathTemplate": "/test",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    }
+  ]
+}

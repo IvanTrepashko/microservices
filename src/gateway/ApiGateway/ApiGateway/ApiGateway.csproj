@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4c93dea6-b686-47b4-bf68-e346fb421612</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.0.0" />
+	<PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.0.0" />
+	<PackageReference Include="Ocelot" Version="23.4.3" />
+	<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+</Project>
