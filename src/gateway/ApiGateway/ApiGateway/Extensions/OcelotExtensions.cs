@@ -1,7 +1,10 @@
-﻿using ApiGateway.Ocelot.Configuration;
+﻿using System.Text.RegularExpressions;
+using ApiGateway.Ocelot.Configuration;
 using ApiGateway.Options;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using Ocelot.Authentication.Middleware;
+using Ocelot.Authorization.Middleware;
 using Ocelot.Cache.Middleware;
 using Ocelot.Claims.Middleware;
 using Ocelot.Configuration.File;
@@ -15,8 +18,6 @@ using Ocelot.QueryStrings.Middleware;
 using Ocelot.Request.Middleware;
 using Ocelot.Requester.Middleware;
 using Ocelot.RequestId.Middleware;
-using Ocelot.Authorization.Middleware;
-using System.Text.RegularExpressions;
 
 namespace ApiGateway.Extensions;
 
@@ -24,40 +25,53 @@ public static partial class OcelotExtensions
 {
     private const char LeftBracket = '{';
     private const char RightBracket = '}';
-
     private const string RootDirectory = "ocelot";
     private const string PrimaryConfigFile = "ocelot.json";
     private const string GlobalConfigFile = "ocelot.global.json";
 
     private const string SubConfigPattern = @"^ocelot\.(.*?)\.json$";
 
-    public static IServiceCollection AddConfigureOcelot(this IServiceCollection services,
-        IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+    public static IServiceCollection AddConfigureOcelot(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IWebHostEnvironment webHostEnvironment
+    )
     {
-        var ocelotConfigurationBuilder = new ConfigurationBuilder()
-            .AddOcelotCustom("routes", webHostEnvironment);
+        var ocelotConfigurationBuilder = new ConfigurationBuilder().AddOcelotCustom(
+            "routes",
+            webHostEnvironment
+        );
 
         var directory = Path.GetDirectoryName(AppContext.BaseDirectory);
         const string fileName = "ocelot.json";
 
-        File.Copy(Path.Combine(webHostEnvironment.ContentRootPath, fileName), Path.Combine(directory, fileName), overwrite: true);
+        File.Copy(
+            Path.Combine(webHostEnvironment.ContentRootPath, fileName),
+            Path.Combine(directory, fileName),
+            overwrite: true
+        );
 
         var ocelotConfiguration = ocelotConfigurationBuilder.Build();
 
         services.Configure<CustomFileConfiguration>(ocelotConfiguration);
-        services.AddSingleton<IOptionsMonitor<FileConfiguration>>(p => p.GetRequiredService<IOptionsMonitor<CustomFileConfiguration>>());
+        services.AddSingleton<IOptionsMonitor<FileConfiguration>>(p =>
+            p.GetRequiredService<IOptionsMonitor<CustomFileConfiguration>>()
+        );
         var routeOptions = ocelotConfiguration.GetSection("Routes");
         services.Configure<List<RouteOptions>>(routeOptions);
 
         services.AddOcelot(ocelotConfiguration);
 
-        services.Configure<OcelotGlobalConfiguration>(configuration.GetSection(nameof(FileConfiguration.GlobalConfiguration)));
+        services.Configure<OcelotGlobalConfiguration>(
+            configuration.GetSection(nameof(FileConfiguration.GlobalConfiguration))
+        );
 
         services.PostConfigure<CustomFileConfiguration>(fileConfiguration =>
         {
             var ocelotOptions = new OcelotGlobalConfiguration();
-            var ocelotConfigurationSection =
-                configuration.GetSection(nameof(FileConfiguration.GlobalConfiguration));
+            var ocelotConfigurationSection = configuration.GetSection(
+                nameof(FileConfiguration.GlobalConfiguration)
+            );
             ocelotConfigurationSection.Bind(ocelotOptions);
 
             if (!(ocelotOptions.ClusterServiceNames?.Any() ?? false))
@@ -77,34 +91,48 @@ public static partial class OcelotExtensions
         return services;
     }
 
-    public static IApplicationBuilder UseOcelotGateway(this IApplicationBuilder app, Action<OcelotPipelineConfiguration> action = null)
+    public static IApplicationBuilder UseOcelotGateway(
+        this IApplicationBuilder app,
+        Action<OcelotPipelineConfiguration> action = null
+    )
     {
         var config = new OcelotPipelineConfiguration();
         action?.Invoke(config);
 
         app.UseOcelot(pipelineConfiguration =>
-        {
-            pipelineConfiguration.MapWhenOcelotPipeline.Add((_) => true, (a) => UseInternalPipeline(a, config));
-        }).GetAwaiter().GetResult();
+            {
+                pipelineConfiguration.MapWhenOcelotPipeline.Add(
+                    (_) => true,
+                    (a) => UseInternalPipeline(a, config)
+                );
+            })
+            .GetAwaiter()
+            .GetResult();
         return app;
     }
 
-    private static void UseInternalPipeline(IApplicationBuilder app, OcelotPipelineConfiguration pipelineConfiguration)
+    private static void UseInternalPipeline(
+        IApplicationBuilder app,
+        OcelotPipelineConfiguration pipelineConfiguration
+    )
     {
         app.UseHttpHeadersTransformationMiddleware();
         app.UseDownstreamRequestInitialiser();
         app.UseRequestIdMiddleware();
-        //app.UseIfNotNull(pipelineConfiguration.PreAuthorizationMiddleware);
-        //if (pipelineConfiguration.AuthorizationMiddleware != null)
-        //    app.UseAuthorization();
-        //else
-        //    app.Use(pipelineConfiguration.AuthorizationMiddleware);
-        //app.UseIfNotNull(pipelineConfiguration.PreAuthenticationMiddleware);
-        //if (pipelineConfiguration.AuthenticationMiddleware != null)
-        //    app.Use(pipelineConfiguration.AuthenticationMiddleware);
-        //app.UseClaimsToClaimsMiddleware();
-        //app.UseClaimsToQueryStringMiddleware();
-        //app.UseClaimsToDownstreamPathMiddleware();
+        app.UseIfNotNull(pipelineConfiguration.PreAuthorizationMiddleware);
+        if (pipelineConfiguration.AuthorizationMiddleware == null)
+            app.UseAuthorizationMiddleware();
+        else
+            app.Use(pipelineConfiguration.AuthorizationMiddleware);
+        app.UseIfNotNull(pipelineConfiguration.PreAuthenticationMiddleware);
+        if (pipelineConfiguration.AuthenticationMiddleware == null)
+            app.UseAuthenticationMiddleware();
+        else
+            app.Use(pipelineConfiguration.AuthenticationMiddleware);
+        app.UseClaimsToClaimsMiddleware();
+        app.UseClaimsToHeadersMiddleware();
+        app.UseClaimsToQueryStringMiddleware();
+        app.UseClaimsToDownstreamPathMiddleware();
         app.UseLoadBalancingMiddleware();
         app.UseDownstreamUrlCreatorMiddleware();
         app.UseOutputCacheMiddleware();
@@ -115,7 +143,8 @@ public static partial class OcelotExtensions
 
     private static void UseIfNotNull(
         this IApplicationBuilder builder,
-        Func<HttpContext, Func<Task>, Task> middleware)
+        Func<HttpContext, Func<Task>, Task> middleware
+    )
     {
         if (middleware == null)
             return;
@@ -125,11 +154,16 @@ public static partial class OcelotExtensions
     private static void ConfigureRoute(
         FileRoute route,
         FileHostAndPort hostAndPort,
-        OcelotGlobalConfiguration ocelotOptions)
+        OcelotGlobalConfiguration ocelotOptions
+    )
     {
         var host = hostAndPort.Host;
 
-        if (string.IsNullOrEmpty(host) || !host.Contains(LeftBracket) || !host.EndsWith(RightBracket))
+        if (
+            string.IsNullOrEmpty(host)
+            || !host.Contains(LeftBracket)
+            || !host.EndsWith(RightBracket)
+        )
             return;
 
         var match = ServiceRegex().Match(host);
@@ -160,8 +194,11 @@ public static partial class OcelotExtensions
         return (url.Scheme, url.Host, url.Port);
     }
 
-    private static IConfigurationBuilder AddOcelotCustom(this IConfigurationBuilder builder, string folder,
-        IWebHostEnvironment env)
+    private static IConfigurationBuilder AddOcelotCustom(
+        this IConfigurationBuilder builder,
+        string folder,
+        IWebHostEnvironment env
+    )
     {
         string excludeConfigName =
             env?.EnvironmentName != null ? $"ocelot.{env.EnvironmentName}.json" : string.Empty;
@@ -180,7 +217,10 @@ public static partial class OcelotExtensions
 
         foreach (var file in files)
         {
-            if (files.Count > 1 && file.Name.Equals(PrimaryConfigFile, StringComparison.OrdinalIgnoreCase))
+            if (
+                files.Count > 1
+                && file.Name.Equals(PrimaryConfigFile, StringComparison.OrdinalIgnoreCase)
+            )
             {
                 continue;
             }
@@ -226,7 +266,8 @@ public static partial class OcelotExtensions
         string folder,
         Regex reg,
         string excludeConfigName,
-        string envFileName)
+        string envFileName
+    )
     {
         List<FileInfo> files;
         if (string.IsNullOrWhiteSpace(folder))
@@ -234,7 +275,13 @@ public static partial class OcelotExtensions
             files = new DirectoryInfo(RootDirectory)
                 .EnumerateFiles("*", SearchOption.AllDirectories)
                 .Where(fi => reg.IsMatch(fi.Name) && (fi.Name != excludeConfigName))
-                .Select(fi => (fi, global: fi.Name.Equals(GlobalConfigFile), envFileName: fi.Name.Equals(envFileName)))
+                .Select(fi =>
+                    (
+                        fi,
+                        global: fi.Name.Equals(GlobalConfigFile),
+                        envFileName: fi.Name.Equals(envFileName)
+                    )
+                )
                 .OrderBy(c => (c.global || c.envFileName, c.envFileName))
                 .Select(c => c.fi)
                 .ToList();
@@ -243,7 +290,13 @@ public static partial class OcelotExtensions
         {
             var globalFiles = new DirectoryInfo(RootDirectory)
                 .EnumerateFiles()
-                .Select(fi => (fi, global: fi.Name.Equals(GlobalConfigFile), envFileName: fi.Name.Equals(envFileName)))
+                .Select(fi =>
+                    (
+                        fi,
+                        global: fi.Name.Equals(GlobalConfigFile),
+                        envFileName: fi.Name.Equals(envFileName)
+                    )
+                )
                 .OrderBy(c => (c.global || c.envFileName, c.envFileName))
                 .Select(c => c.fi)
                 .ToList();
@@ -260,7 +313,11 @@ public static partial class OcelotExtensions
         return files;
     }
 
-    [GeneratedRegex(@"^{service:(?<service>\w+)}$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
+    [GeneratedRegex(
+        @"^{service:(?<service>\w+)}$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled,
+        "en-US"
+    )]
     private static partial Regex ServiceRegex();
 
     #endregion Helper methods

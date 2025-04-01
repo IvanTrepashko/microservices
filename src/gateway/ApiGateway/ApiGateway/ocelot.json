@@ -1,18 +1,17 @@
 {
   "GlobalConfiguration": {
     "ClusterServiceNames": {
-      "AuthenticationService": "http://localhost:5001",
-      "ApiGateway": "http://localhost:5099"
+      "AuthenticationService": "http://localhost:5001"
     }
   },
   "Aggregates": [],
   "Routes": [
     {
-      "DownstreamPathTemplate": "/test",
+      "DownstreamPathTemplate": "/api/adminauthenticate/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "{service:ApiGateway}"
+          "Host": "{service:AuthenticationService}"
         }
       ],
       "UpstreamPathTemplate": "/test",

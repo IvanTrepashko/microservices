@@ -1,11 +1,11 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/test",
+      "DownstreamPathTemplate": "/api/adminauthenticate/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "{service:ApiGateway}"
+          "Host": "{service:AuthenticationService}"
         }
       ],
       "UpstreamPathTemplate": "/test",
