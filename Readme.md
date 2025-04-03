@@ -103,6 +103,11 @@ High-load e-commerce platform built with microservices architecture.
   - Review analytics
   - Review search
 
+### 12. Client Service
+- **Tech**: C#, MongoDB, RabbitMQ, Kafka
+- **Fetures**:
+  - Client management
+
 ## Infrastructure
 
 ### Message Brokers

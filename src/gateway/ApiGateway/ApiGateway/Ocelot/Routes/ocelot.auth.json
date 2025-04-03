@@ -1,16 +1,29 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/adminauthenticate/login",
+      "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "{service:AuthenticationService}"
         }
       ],
-      "UpstreamPathTemplate": "/test",
+      "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": [
-        "GET"
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:AuthenticationService}"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/register",
+      "UpstreamHttpMethod": [
+        "POST"
       ]
     }
   ]

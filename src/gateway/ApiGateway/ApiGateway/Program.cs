@@ -1,7 +1,6 @@
 using ApiGateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Ocelot.Values;
 using System.Text;
 
 namespace ApiGateway;
