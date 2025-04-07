@@ -1,17 +1,20 @@
-﻿using AuthService.Application.Models.Identity;
-using AuthService.Application.Services.Abstractions;
+﻿using AuthService.Application.Services.Abstractions;
+using AuthService.Infrastructure.DbContexts;
+using AuthService.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Application.Commands.Authentication;
 
-public record RegisterCommand(string Email, string Password, string UserName) : IRequest<RegisterCommandResponse>;
+public record RegisterCommand(string Email, string Password, string UserName)
+    : IRequest<RegisterCommandResponse>;
 
 public record RegisterCommandResponse(string AccessToken, string RefreshToken);
 
 public class RegisterCommandHandler(
     UserManager<ApplicationUser> userManager,
-    IJwtService jwtService
+    IJwtService jwtService,
+    AuthContext authContext
 ) : IRequestHandler<RegisterCommand, RegisterCommandResponse>
 {
     public async Task<RegisterCommandResponse> Handle(
@@ -26,7 +29,12 @@ public class RegisterCommandHandler(
             throw new Exception("User already exists");
         }
 
-        var user = new ApplicationUser { Email = request.Email, EmailConfirmed = false, UserName = request.UserName };
+        var user = new ApplicationUser
+        {
+            Email = request.Email,
+            EmailConfirmed = false,
+            UserName = request.UserName,
+        };
 
         var result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)

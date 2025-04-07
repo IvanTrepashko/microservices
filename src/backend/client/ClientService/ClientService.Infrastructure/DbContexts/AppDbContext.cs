@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClientService.Infrastructure.DbContexts;
 
-public class AppContext(DbContextOptions<AppContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Client> Clients { get; set; }
     public DbSet<ClientPreferences> ClientPreferences { get; set; }

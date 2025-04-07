@@ -18,6 +18,7 @@ public class Client
     public DateTime UpdatedAt { get; private set; }
 
     public Client(
+        long id,
         Name name,
         Email email,
         PhoneNumber phoneNumber,
@@ -29,6 +30,7 @@ public class Client
         DateTime createdAt
     )
     {
+        Id = id;
         Name = name;
         Email = email;
         PhoneNumber = phoneNumber;

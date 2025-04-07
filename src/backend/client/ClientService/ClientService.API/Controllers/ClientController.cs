@@ -1,4 +1,6 @@
 using AutoMapper;
+using ClientService.API.ApiModels;
+using ClientService.Application.Commands.Clients;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,19 +15,29 @@ public class ClientController(ISender sender, IMapper mapper) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProfileInfo()
     {
-        var query = new GetProfileInfoQuery(HttpContext.GetUserId());
+        var userId = HttpContext.GetUserId();
+        var query = new GetProfileInfoQuery(userId);
+
         var result = await sender.Send(query);
+
         var response = mapper.Map<ProfileInfoApiResponse>(result);
 
         return Ok(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateClient(CreateClientRequest request)
+    [HttpPost("profile")]
+    public async Task<IActionResult> CreateClientProfile(CreateClientRequest request)
     {
-        var command = mapper.Map<CreateClientCommand>(request);
-        var result = await sender.Send(command);
-        var response = mapper.Map<CreateClientResponse>(result);
-        return Ok(response);
+        var command = new CreateClientProfileCommand(
+            HttpContext.GetUserId(),
+            Email.Create(request.Email.Value),
+            request.Email,
+            request.PhoneNumber,
+            request.Address,
+            request.BirthDate,
+            request.Gender
+        );
+        await sender.Send(command);
+        return Ok();
     }
 }

@@ -1,4 +1,4 @@
-﻿using AuthService.Application.Models.Identity;
+﻿using AuthService.Infrastructure.Identity;
 
 namespace AuthService.Application.Services.Abstractions;
 

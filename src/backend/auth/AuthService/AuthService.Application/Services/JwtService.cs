@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using AuthService.Application.Models.Identity;
 using AuthService.Application.Options;
 using AuthService.Application.Services.Abstractions;
+using AuthService.Infrastructure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
