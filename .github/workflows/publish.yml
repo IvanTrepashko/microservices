@@ -2,7 +2,9 @@ name: Publish to GitHub Packages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+    paths:
+      - 'src/shared/csharp/**'
   workflow_dispatch:
 
 jobs:
@@ -12,6 +14,10 @@ jobs:
       contents: read
       packages: write
 
+    defaults:
+      run:
+        working-directory: src/shared/csharp/Shared
+
     steps:
     - uses: actions/checkout@v4
     
@@ -19,6 +25,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         
     - name: Restore dependencies
       run: dotnet restore
@@ -33,4 +42,4 @@ jobs:
       run: dotnet pack --configuration Release --no-build --output nupkg
       
     - name: Push to GitHub Packages
-      run: dotnet nuget push "nupkg/*.nupkg" --api-key ${{secrets.GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/${{github.repository_owner}}/index.json" 
+      run: dotnet nuget push "nupkg/*.nupkg" --api-key ${{secrets.GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/${{github.repository_owner}}/index.json" --skip-duplicate
