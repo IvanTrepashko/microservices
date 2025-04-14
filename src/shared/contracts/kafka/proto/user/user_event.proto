@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package user;
+
+option csharp_namespace = "Contracts.Kafka.User";
+
+// user.cdc.event
+message UserEvent {
+    string user_id = 1;
+    string email = 2;
+    string phone_number = 3;
+}

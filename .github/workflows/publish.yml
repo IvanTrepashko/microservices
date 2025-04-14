@@ -5,10 +5,11 @@ on:
     branches: [ main, master ]
     paths:
       - 'src/shared/csharp/**'
+      - 'src/shared/contracts/kafka/**'
   workflow_dispatch:
 
 jobs:
-  build:
+  build-shared:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,6 +38,39 @@ jobs:
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output nupkg
+      
+    - name: Push to GitHub Packages
+      run: dotnet nuget push "nupkg/*.nupkg" --api-key ${{secrets.GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/${{github.repository_owner}}/index.json" --skip-duplicate
+
+  build-kafka-contracts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    defaults:
+      run:
+        working-directory: src/shared/contracts/kafka/csharp
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
       
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output nupkg

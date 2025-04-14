@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package user;
+
+option csharp_namespace = "Contracts.Kafka.User";
+
+// user.fct.user_registered_event
+message UserRegisteredEvent {
+    int64 user_id = 1;
+    string email = 2;
+    string phone_number = 3;
+}
