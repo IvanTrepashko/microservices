@@ -1,7 +1,8 @@
 {
   "GlobalConfiguration": {
     "ClusterServiceNames": {
-      "ApiGateway": "http://localhost:5099"
+      "AuthenticationService": "http://localhost:5002",
+      "ClientService": "http://localhost:5002"
     }
   }
 }

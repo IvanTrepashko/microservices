@@ -1,21 +1,49 @@
 {
   "GlobalConfiguration": {
     "ClusterServiceNames": {
-      "AuthenticationService": "http://localhost:5001"
+      "AuthenticationService": "http://localhost:5002",
+      "ClientService": "http://localhost:5004"
     }
   },
   "Aggregates": [],
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/adminauthenticate/login",
+      "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "{service:AuthenticationService}"
         }
       ],
-      "UpstreamPathTemplate": "/test",
+      "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:AuthenticationService}"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/register",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/client/profile",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:ClientService}"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/client/profile",
+      "UpstreamHttpMethod": [
+        "POST",
         "GET"
       ]
     }

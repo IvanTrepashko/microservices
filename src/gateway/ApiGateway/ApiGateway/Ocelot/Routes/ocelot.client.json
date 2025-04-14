@@ -1,0 +1,18 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/client/profile",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{service:ClientService}"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/client/profile",
+      "UpstreamHttpMethod": [
+        "POST",
+        "GET"
+      ]
+    }
+  ]
+}

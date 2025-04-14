@@ -11,7 +11,7 @@ public record CreateClientProfileCommand(
     Name Name,
     Email Email,
     PhoneNumber PhoneNumber,
-    ClientAddress Address,
+    Address Address,
     DateTime BirthDate,
     ClientGender Gender
 ) : IRequest;
@@ -30,12 +30,14 @@ public class CreateClientProfileCommandHandler(AppDbContext context)
                 cancellationToken
             ) ?? throw new Exception("Client not found");
 
+        var clientAddress = new ClientAddress(request.ClientId, request.Address);
+
         var client = new Client(
             request.ClientId,
             request.Name,
             request.Email,
             request.PhoneNumber,
-            request.Address,
+            clientAddress,
             request.BirthDate,
             ClientType.Individual,
             ClientStatus.Active,

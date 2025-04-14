@@ -1,6 +1,6 @@
-﻿using AuthService.Application.Models.Identity;
-using AuthService.Application.Options;
+﻿using AuthService.Application.Options;
 using AuthService.Application.Services.Abstractions;
+using AuthService.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

@@ -1,12 +1,10 @@
-using ClientService.Domain.Common;
-
-namespace ClientService.API.ApiModels;
+﻿namespace ApiGateway.Controllers.Areas.Client.ApiModels;
 
 public record CreateClientRequest(
-    Name Name,
-    Email Email,
-    PhoneNumber PhoneNumber,
-    Address Address,
+    NameApiModel Name,
+    EmailApiModel Email,
+    PhoneNumberApiModel PhoneNumber,
+    ClientAddressApiModel Address,
     DateTime BirthDate,
     ClientGender Gender
 );

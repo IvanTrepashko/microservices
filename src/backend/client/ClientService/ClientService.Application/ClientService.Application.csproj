@@ -7,14 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Queries\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ClientService.Domain\ClientService.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
   </ItemGroup>
 
   <ItemGroup>

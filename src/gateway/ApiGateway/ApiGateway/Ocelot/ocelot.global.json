@@ -1,7 +1,8 @@
 {
   "GlobalConfiguration": {
     "ClusterServiceNames": {
-      "AuthenticationService": "http://localhost:5001"
+      "AuthenticationService": "http://localhost:5002",
+      "ClientService": "http://localhost:5004"
     }
   }
 }

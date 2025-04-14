@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132 d17.12
+VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.API", "AuthService.API\AuthService.API.csproj", "{DE408EE4-D2A8-41F1-ACE8-64E29B531149}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.AppHost", "AuthService.AppHost\AuthService.AppHost.csproj", "{865616DC-6FA5-431C-BFC1-81A92BC8CAAF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Application", "AuthService.Application\AuthService.Application.csproj", "{E2E7BDB2-F4D5-48C4-8762-01C4AA0D822C}"
 EndProject
@@ -23,10 +21,6 @@ Global
 		{DE408EE4-D2A8-41F1-ACE8-64E29B531149}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE408EE4-D2A8-41F1-ACE8-64E29B531149}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE408EE4-D2A8-41F1-ACE8-64E29B531149}.Release|Any CPU.Build.0 = Release|Any CPU
-		{865616DC-6FA5-431C-BFC1-81A92BC8CAAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{865616DC-6FA5-431C-BFC1-81A92BC8CAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{865616DC-6FA5-431C-BFC1-81A92BC8CAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{865616DC-6FA5-431C-BFC1-81A92BC8CAAF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2E7BDB2-F4D5-48C4-8762-01C4AA0D822C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2E7BDB2-F4D5-48C4-8762-01C4AA0D822C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2E7BDB2-F4D5-48C4-8762-01C4AA0D822C}.Release|Any CPU.ActiveCfg = Release|Any CPU

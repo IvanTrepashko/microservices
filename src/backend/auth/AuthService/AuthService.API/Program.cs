@@ -1,6 +1,7 @@
 using AuthService.API.Mappings;
 using AuthService.Application.Extensions;
 using AuthService.Infrastructure.Extensions;
+using AuthService.API.Extensions;
 
 namespace AuthService.API;
 

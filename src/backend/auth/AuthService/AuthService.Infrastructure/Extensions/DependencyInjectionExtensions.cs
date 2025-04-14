@@ -1,6 +1,5 @@
-﻿using AuthService.Application.Models.Identity;
-using AuthService.Infrastructure.Configuration;
-using AuthService.Infrastructure.DbContexts;
+﻿using AuthService.Infrastructure.DbContexts;
+using AuthService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,13 +9,6 @@ namespace AuthService.Infrastructure.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection ConfigureOptions(this IServiceCollection services)
-    {
-        services.ConfigureOptions<JwtOptionsConfigure>();
-
-        return services;
-    }
-
     public static IServiceCollection ConfigurePostgres(
         this IServiceCollection services,
         IConfiguration configuration
