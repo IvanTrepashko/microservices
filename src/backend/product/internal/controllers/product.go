@@ -17,6 +17,13 @@ func NewProductController(dispatcher *mediator.Dispatcher) *ProductController {
 	return &ProductController{dispatcher: dispatcher}
 }
 
+// @Summary Get product by ID
+// @Description Get product by ID
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID"
+// @Success 200 {object} queries.GetProductQueryByIdResponse
+// @Router /api/product/{id} [get]
 func (c *ProductController) GetProductByID(ctx *fiber.Ctx) error {
 	query := &queries.GetProductQueryById{
 		ID: ctx.Params("id"),
@@ -32,6 +39,13 @@ func (c *ProductController) GetProductByID(ctx *fiber.Ctx) error {
 	return ctx.JSON(res)
 }
 
+// @Summary Create product
+// @Description Create product
+// @Accept json
+// @Produce json
+// @Param product body products.CreateProductRequest true "Product"
+// @Success 201 {object} products.CreateProductResponse
+// @Router /api/product [post]
 func (c *ProductController) CreateProduct(ctx *fiber.Ctx) error {
 	var req products.CreateProductRequest
 	if err := ctx.BodyParser(&req); err != nil {
@@ -46,7 +60,7 @@ func (c *ProductController) CreateProduct(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(res)
 }
 
-func (c *ProductController) RegisterRoutes(app *fiber.App) {
-	app.Get("api/product/:id", c.GetProductByID)
-	app.Post("api/product", c.CreateProduct)
+func (c *ProductController) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
+	app.Get("api/product/:id", authMiddleware, c.GetProductByID)
+	app.Post("api/product", authMiddleware, c.CreateProduct)
 }

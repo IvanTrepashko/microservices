@@ -2,14 +2,19 @@ package main
 
 import (
 	"log"
+	"product-service/configs"
 	commands "product-service/internal/application/commands/products"
 	"product-service/internal/application/mediator"
 	queries "product-service/internal/application/queries/products"
 	"product-service/internal/controllers"
 	"product-service/internal/infrastructure/database"
+	"product-service/internal/infrastructure/middlewares"
 	"product-service/internal/infrastructure/repository"
 
+	_ "product-service/docs" // Important: must match your module name
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 func main() {
@@ -22,16 +27,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	app.Get("/swagger/*", swagger.New(swagger.Config{
+		Title:       "Product Catalog API",
+		DeepLinking: false,
+	}))
 	productRepo := repository.NewProductRepository(db)
 
 	// Init core dependencies
 	dispatcher := mediator.NewDispatcher()
 
+	authMiddleware := middlewares.NewAuthMiddleware(configs.JWTKey)
+
 	// Register all query/command handlers
 	registerHandlers(dispatcher, productRepo)
 
 	// Register all controllers
-	registerControllers(app, dispatcher)
+	registerControllers(app, dispatcher, authMiddleware)
 
 	app.Listen(":3000")
 }
@@ -50,10 +61,10 @@ func registerHandlers(dispatcher *mediator.Dispatcher, productRepo *repository.P
 	)
 }
 
-func registerControllers(app *fiber.App, dispatcher *mediator.Dispatcher) {
+func registerControllers(app *fiber.App, dispatcher *mediator.Dispatcher, authMiddleware fiber.Handler) {
 	// Product routes
 	productController := controllers.NewProductController(dispatcher)
-	productController.RegisterRoutes(app)
+	productController.RegisterRoutes(app, authMiddleware)
 }
 
 func customErrorHandler(ctx *fiber.Ctx, err error) error {

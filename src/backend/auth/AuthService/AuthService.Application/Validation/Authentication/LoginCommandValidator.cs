@@ -12,7 +12,7 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
             .NotEmpty()
             .EmailAddress()
             .WithMessage("Invalid email address")
-            .WithErrorCode("");
+            .WithErrorCode("Email.Invalid");
 
         RuleFor(x => x.Password).NotEmpty().WithMessage("Password is required");
     }

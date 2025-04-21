@@ -1,0 +1,75 @@
+definitions:
+  product-service_internal_application_queries_products.GetProductQueryByIdResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  product-service_internal_models_products.CreateProductRequest:
+    properties:
+      category_id:
+        example: phones
+        type: string
+      name:
+        example: iPhone 13
+        type: string
+      price:
+        example: 999.99
+        type: number
+      stock:
+        example: 100
+        type: integer
+    type: object
+  product-service_internal_models_products.CreateProductResponse:
+    properties:
+      id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/product:
+    post:
+      consumes:
+      - application/json
+      description: Create product
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/product-service_internal_models_products.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/product-service_internal_models_products.CreateProductResponse'
+      summary: Create product
+  /api/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/product-service_internal_application_queries_products.GetProductQueryByIdResponse'
+      summary: Get product by ID
+swagger: "2.0"
