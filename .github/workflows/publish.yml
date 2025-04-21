@@ -32,6 +32,17 @@ jobs:
         
     - name: Restore dependencies
       run: dotnet restore
+
+    - name: Get current version
+      run: |
+        VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" **/*.csproj)
+        echo "Current version: $VERSION"
+        NEW_VERSION=$(echo $VERSION | awk -F. '{$NF = $NF + 1;}1' OFS=.)
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        
+    - name: Update Version
+      run: |
+        find . -name "*.csproj" -type f -exec sed -i "s/<Version>.*<\/Version>/<Version>${{env.NEW_VERSION}}<\/Version>/g" {} \;
       
     - name: Build
       run: dotnet build --configuration Release --no-restore
@@ -69,6 +80,16 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
+    - name: Get current version
+      run: |
+        VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" **/*.csproj)
+        echo "Current version: $VERSION"
+        NEW_VERSION=$(echo $VERSION | awk -F. '{$NF = $NF + 1;}1' OFS=.)
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        
+    - name: Update Version
+      run: |
+        find . -name "*.csproj" -type f -exec sed -i "s/<Version>.*<\/Version>/<Version>${{env.NEW_VERSION}}<\/Version>/g" {} \;
     - name: Build
       run: dotnet build --configuration Release --no-restore
       
