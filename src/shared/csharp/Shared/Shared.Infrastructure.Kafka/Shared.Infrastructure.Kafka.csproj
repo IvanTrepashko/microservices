@@ -4,6 +4,13 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Shared.Infrastructure.Kafka</PackageId>
+    <Version>1.0.1</Version>
+    <Description>Kafka infrastructure for microservices</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/IvanTrepashko/microservices</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
