@@ -8,8 +8,6 @@
     <Version>1.0.1</Version>
     <Description>Kafka infrastructure for microservices</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/IvanTrepashko/microservices</RepositoryUrl>
   </PropertyGroup>
 
