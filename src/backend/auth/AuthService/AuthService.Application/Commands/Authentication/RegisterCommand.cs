@@ -1,8 +1,9 @@
-﻿using AuthService.Application.Services.Abstractions;
-using AuthService.Infrastructure.DbContexts;
+﻿using AuthService.Application.Errors;
+using AuthService.Application.Services.Abstractions;
 using AuthService.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Shared.Core.Exceptions;
 
 namespace AuthService.Application.Commands.Authentication;
 
@@ -13,8 +14,7 @@ public record RegisterCommandResponse(string AccessToken, string RefreshToken);
 
 public class RegisterCommandHandler(
     UserManager<ApplicationUser> userManager,
-    IJwtService jwtService,
-    AuthContext authContext
+    IJwtService jwtService
 ) : IRequestHandler<RegisterCommand, RegisterCommandResponse>
 {
     public async Task<RegisterCommandResponse> Handle(
@@ -25,8 +25,10 @@ public class RegisterCommandHandler(
         var existingUser = await userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            // todo: add error handling
-            throw new Exception("User already exists");
+            throw new BadRequestException(
+                AuthenticationErrors.UserAlreadyExists.Code,
+                AuthenticationErrors.UserAlreadyExists.Message
+            );
         }
 
         var user = new ApplicationUser
@@ -37,21 +39,19 @@ public class RegisterCommandHandler(
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
+
         if (!result.Succeeded)
         {
-            // todo: add error handling
-            throw new Exception("Failed to create user");
+            throw new BadRequestException(string.Join(',', result.Errors.Select(x => x.Code)));
         }
 
         await userManager.AddToRoleAsync(user, "User");
         await userManager.UpdateAsync(user);
 
-        // Generate tokens
         var roles = await userManager.GetRolesAsync(user);
         var accessToken = jwtService.GenerateAccessToken(user, roles);
         var refreshToken = jwtService.GenerateRefreshToken();
 
-        // Store refresh token
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await userManager.UpdateAsync(user);

@@ -31,6 +31,8 @@ public class Program
             x.AddProfile<MappingProfile>();
         });
 
+        builder.Services.AddRabbitMq();
+
         var app = builder.Build();
 
         // Apply migrations in a scope

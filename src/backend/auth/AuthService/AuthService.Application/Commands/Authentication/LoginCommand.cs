@@ -1,9 +1,11 @@
-﻿using AuthService.Application.Options;
+﻿using AuthService.Application.Errors;
+using AuthService.Application.Options;
 using AuthService.Application.Services.Abstractions;
 using AuthService.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Shared.Core.Exceptions;
 
 namespace AuthService.Application.Commands.Authentication;
 
@@ -25,7 +27,7 @@ public class LoginCommandHandler(
     {
         var user =
             await userManager.FindByEmailAsync(request.Email)
-            ?? throw new Exception("User not found"); //todo: create errors
+            ?? throw new NotFoundException<ApplicationUser>(request.Email);
 
         var signInResult = await signInManager.CheckPasswordSignInAsync(
             user,
@@ -35,7 +37,10 @@ public class LoginCommandHandler(
 
         if (!signInResult.Succeeded)
         {
-            // todo: unauthorized
+            throw new UnauthorizedException(
+                AuthenticationErrors.InvalidCredentials.Code,
+                AuthenticationErrors.InvalidCredentials.Message
+            );
         }
 
         var roles = await userManager.GetRolesAsync(user);

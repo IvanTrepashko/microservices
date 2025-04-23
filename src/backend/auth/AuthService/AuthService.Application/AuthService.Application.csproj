@@ -13,11 +13,17 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.14" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.1.2" />
+    <PackageReference Include="Shared.Core" Version="1.0.1" />
+    <PackageReference Include="Shared.Infrastructure.RabbitMQ" Version="1.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AuthService.Infrastructure\AuthService.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Integration\EventHandlers\" />
   </ItemGroup>
 
 </Project>
