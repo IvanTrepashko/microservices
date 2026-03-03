@@ -9,6 +9,7 @@ using Ocelot.Cache.Middleware;
 using Ocelot.Claims.Middleware;
 using Ocelot.Configuration.File;
 using Ocelot.DependencyInjection;
+using Ocelot.Provider.Polly;
 using Ocelot.DownstreamPathManipulation.Middleware;
 using Ocelot.DownstreamUrlCreator.Middleware;
 using Ocelot.Headers.Middleware;
@@ -34,12 +35,14 @@ public static partial class OcelotExtensions
     public static IServiceCollection AddConfigureOcelot(
         this IServiceCollection services,
         IConfiguration configuration,
-        IWebHostEnvironment webHostEnvironment
+        IWebHostEnvironment webHostEnvironment,
+        out IConfiguration ocelotConfiguration
     )
     {
         var ocelotConfigurationBuilder = new ConfigurationBuilder().AddOcelotCustom(
             "routes",
-            webHostEnvironment
+            webHostEnvironment,
+            configuration
         );
 
         var directory = Path.GetDirectoryName(AppContext.BaseDirectory);
@@ -51,7 +54,7 @@ public static partial class OcelotExtensions
             overwrite: true
         );
 
-        var ocelotConfiguration = ocelotConfigurationBuilder.Build();
+        ocelotConfiguration = ocelotConfigurationBuilder.Build();
 
         services.Configure<CustomFileConfiguration>(ocelotConfiguration);
         services.AddSingleton<IOptionsMonitor<FileConfiguration>>(p =>
@@ -60,7 +63,7 @@ public static partial class OcelotExtensions
         var routeOptions = ocelotConfiguration.GetSection("Routes");
         services.Configure<List<RouteOptions>>(routeOptions);
 
-        services.AddOcelot(ocelotConfiguration);
+        services.AddOcelot(ocelotConfiguration).AddPolly();
 
         services.Configure<OcelotGlobalConfiguration>(
             configuration.GetSection(nameof(FileConfiguration.GlobalConfiguration))
@@ -197,7 +200,8 @@ public static partial class OcelotExtensions
     private static IConfigurationBuilder AddOcelotCustom(
         this IConfigurationBuilder builder,
         string folder,
-        IWebHostEnvironment env
+        IWebHostEnvironment env,
+        IConfiguration appConfiguration
     )
     {
         string excludeConfigName =
@@ -236,6 +240,7 @@ public static partial class OcelotExtensions
 
             AddRange(aggregatesConfig, "Aggregates");
             AddRange(routes, "Routes");
+            AddRange(swaggerEndpoints, "SwaggerEndPoints");
 
             void AddRange(JArray obj, string key)
             {
@@ -248,10 +253,13 @@ public static partial class OcelotExtensions
             }
         }
 
+        ResolveSwaggerEndPointUrls(swaggerEndpoints, appConfiguration);
+
         var obj = JObject.Parse("{}");
         obj["GlobalConfiguration"] = globalConfig;
         obj["Aggregates"] = aggregatesConfig;
         obj["Routes"] = routes;
+        obj["SwaggerEndPoints"] = swaggerEndpoints;
 
         var json = obj.ToString();
 
@@ -313,12 +321,53 @@ public static partial class OcelotExtensions
         return files;
     }
 
+    private static void ResolveSwaggerEndPointUrls(
+        JArray swaggerEndPoints,
+        IConfiguration appConfiguration
+    )
+    {
+        var serviceNames = appConfiguration
+            .GetSection("GlobalConfiguration:ClusterServiceNames")
+            .Get<Dictionary<string, string>>();
+
+        if (serviceNames is null or { Count: 0 })
+            return;
+
+        foreach (var endpoint in swaggerEndPoints)
+        {
+            var configs = endpoint["Config"] as JArray;
+            if (configs is null) continue;
+
+            foreach (var config in configs)
+            {
+                var url = config["Url"]?.ToString();
+                if (url is null) continue;
+
+                var match = ServiceUrlRegex().Match(url);
+                if (!match.Success) continue;
+
+                var serviceName = match.Groups["service"].Value;
+                if (serviceNames.TryGetValue(serviceName, out var serviceUrl))
+                {
+                    config["Url"] = url.Replace(match.Value, serviceUrl.TrimEnd('/'));
+                }
+            }
+        }
+    }
+
     [GeneratedRegex(
         @"^{service:(?<service>\w+)}$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled,
         "en-US"
     )]
     private static partial Regex ServiceRegex();
+
+    [GeneratedRegex(
+        @"\{service:(?<service>\w+)\}",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled,
+        "en-US"
+    )]
+    private static partial Regex ServiceUrlRegex();
 
     #endregion Helper methods
 }

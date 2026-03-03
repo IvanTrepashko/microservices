@@ -1,6 +1,7 @@
 {
   "Routes": [
     {
+      "SwaggerKey": "client",
       "DownstreamPathTemplate": "/api/client/profile",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -12,6 +13,23 @@
       "UpstreamHttpMethod": [
         "POST",
         "GET"
+      ],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 10000,
+        "TimeoutValue": 5000
+      }
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "client",
+      "Config": [
+        {
+          "Name": "Client API",
+          "Version": "v1",
+          "Url": "{service:ClientService}/swagger/v1/swagger.json"
+        }
       ]
     }
   ]

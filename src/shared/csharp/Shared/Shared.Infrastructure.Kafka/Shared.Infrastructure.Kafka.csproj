@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Shared.Infrastructure.Kafka</PackageId>
+    <PackageId>ECommerce.Shared.Infrastructure.Kafka</PackageId>
     <Version>1.0.1</Version>
     <Description>Kafka infrastructure for microservices</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

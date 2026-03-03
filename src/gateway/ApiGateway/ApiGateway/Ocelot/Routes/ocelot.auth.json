@@ -1,6 +1,7 @@
 {
   "Routes": [
     {
+      "SwaggerKey": "auth",
       "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -11,9 +12,15 @@
       "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": [
         "POST"
-      ]
+      ],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 10000,
+        "TimeoutValue": 5000
+      }
     },
     {
+      "SwaggerKey": "auth",
       "DownstreamPathTemplate": "/api/auth/register",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -24,6 +31,23 @@
       "UpstreamPathTemplate": "/api/auth/register",
       "UpstreamHttpMethod": [
         "POST"
+      ],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 10000,
+        "TimeoutValue": 5000
+      }
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "auth",
+      "Config": [
+        {
+          "Name": "Auth API",
+          "Version": "v1",
+          "Url": "{service:AuthenticationService}/swagger/v1/swagger.json"
+        }
       ]
     }
   ]

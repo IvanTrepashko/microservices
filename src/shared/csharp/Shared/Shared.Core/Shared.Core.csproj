@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <PackageId>Shared.Core</PackageId>
+    <PackageId>ECommerce.Shared.Core</PackageId>
     <Version>1.0.1</Version>
     <Description>Core shared library for microservices</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
