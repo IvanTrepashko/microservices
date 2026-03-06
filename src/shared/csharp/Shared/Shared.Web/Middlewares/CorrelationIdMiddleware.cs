@@ -3,12 +3,12 @@ using Serilog.Context;
 
 namespace Shared.Web.Middlewares;
 
-public class CorrelationIdMiddleware : IMiddleware
+public class CorrelationIdMiddleware(RequestDelegate next)
 {
     private const string CorrelationIdHeaderName = "X-Correlation-ID";
     private const string CorrelationId = "CorrelationId";
     
-    public Task InvokeAsync(HttpContext context, RequestDelegate next)
+    public Task InvokeAsync(HttpContext context)
     {
         if (!context.Request.Headers.TryGetValue(CorrelationIdHeaderName, out var value))
         {
