@@ -42,12 +42,16 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
                 ? value?.ToString()
                 : null;
 
+            var (errorCode, errorMessage) = ex is Shared.Core.Exceptions.ApplicationException appEx
+                ? (appEx.ErrorCode, appEx.ErrorMessage)
+                : ((string?)null, "An unexpected error occurred");
+
             var response = new ProblemResponse
             {
-                Type = $"https://httpstatuses.com/{(int)statusCode}",
                 Title = title,
                 Status = (int)statusCode,
-                Detail = ex.Message,
+                Code = errorCode,
+                Message = errorMessage,
                 Instance = context.Request.Path,
                 CorrelationId = correlationId,
             };
@@ -72,10 +76,10 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
 
     private sealed class ProblemResponse
     {
-        public string? Type { get; init; }
         public string? Title { get; init; }
         public int Status { get; init; }
-        public string? Detail { get; init; }
+        public string? Code { get; set; }
+        public string Message { get; set; }
         public string? Instance { get; init; }
         public string? CorrelationId { get; init; }
     }
