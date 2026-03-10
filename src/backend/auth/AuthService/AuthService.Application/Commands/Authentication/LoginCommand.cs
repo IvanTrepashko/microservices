@@ -17,7 +17,8 @@ public class LoginCommandHandler(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IJwtService jwtService,
-    IOptionsMonitor<JwtOptions> jwtOptions
+    IOptionsMonitor<JwtOptions> jwtOptions,
+    TimeProvider timeProvider
 ) : IRequestHandler<LoginCommand, LoginCommandResponse>
 {
     public async Task<LoginCommandResponse> Handle(
@@ -45,13 +46,13 @@ public class LoginCommandHandler(
 
         var roles = await userManager.GetRolesAsync(user);
 
-        var accessToken = jwtService.GenerateAccessToken(user, roles);
+        var accessToken = jwtService.GenerateAccessToken(user, roles.FirstOrDefault());
         var refreshToken = jwtService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(
-            jwtOptions.CurrentValue.RefreshTokenExpirationDays
-        );
+        user.RefreshTokenExpiryTime = timeProvider
+            .GetUtcNow()
+            .UtcDateTime.AddDays(jwtOptions.CurrentValue.RefreshTokenExpirationDays);
 
         await userManager.UpdateAsync(user);
 

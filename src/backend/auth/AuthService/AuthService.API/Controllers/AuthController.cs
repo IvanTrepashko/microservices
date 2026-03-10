@@ -2,15 +2,14 @@
 using AuthService.Application.Commands.Authentication;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(
-    ISender sender,
-    IMapper mapper) : ControllerBase
+public class AuthController(ISender sender, IMapper mapper) : ControllerBase
 {
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponseApiModel), StatusCodes.Status200OK)]
@@ -32,5 +31,23 @@ public class AuthController(
         var response = mapper.Map<RegisterResponseApiModel>(result);
 
         return Ok(response);
+    }
+
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(RefreshTokenCommandResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestApiModel request)
+    {
+        var command = new RefreshTokenCommand(request.AccessToken, request.RefreshToken);
+        var result = await sender.Send(command, HttpContext.RequestAborted);
+        return Ok(result);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var command = new LogoutCommand(User);
+        await sender.Send(command, HttpContext.RequestAborted);
+        return Ok();
     }
 }

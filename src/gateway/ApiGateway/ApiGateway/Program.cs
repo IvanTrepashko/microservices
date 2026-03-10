@@ -4,7 +4,8 @@ using ApiGateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-    
+using Shared.Web.Extensions;
+
 namespace ApiGateway;
 
 public class Program
@@ -23,8 +24,6 @@ public class Program
         
         builder.Host.UseSerilog((ctx, cfg) => cfg
             .ReadFrom.Configuration(ctx.Configuration));
-
-        // Add services to the container.
 
         builder.Services.AddControllers();
 
@@ -93,6 +92,8 @@ public class Program
         {
             opt.PathToSwaggerGenerator = "/swagger/docs";
         });
+
+        app.AddCorrelationId();
 
         app.UseRouting();
 

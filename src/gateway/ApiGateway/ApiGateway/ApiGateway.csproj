@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,21 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ecommerce.shared.web" Version="1.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
-	<PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
-	<PackageReference Include="MMLib.SwaggerForOcelot" Version="8.3.2" />
-	<PackageReference Include="Ocelot" Version="23.2.2" />
-	<PackageReference Include="Ocelot.Provider.Polly" Version="23.2.2" />
-	<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
-	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
-	<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-	<PackageReference Include="Serilog.Sinks.Http" Version="9.2.1" />
-	<PackageReference Include="ECommerce.Shared.Web" Version="1.0.11" />
+    <PackageReference
+      Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets"
+      Version="1.21.0"
+    />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
+    <PackageReference Include="MMLib.SwaggerForOcelot" Version="8.3.2" />
+    <PackageReference Include="Ocelot" Version="23.2.2" />
+    <PackageReference Include="Ocelot.Provider.Polly" Version="23.2.2" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Http" Version="9.2.1" />
   </ItemGroup>
-
 </Project>

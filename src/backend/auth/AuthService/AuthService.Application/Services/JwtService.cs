@@ -10,28 +10,29 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService.Application.Services;
 
-public class JwtService(IOptionsMonitor<JwtOptions> options) : IJwtService
+public class JwtService(IOptions<JwtOptions> options, TimeProvider timeProvider) : IJwtService
 {
-    private readonly JwtOptions jwtOptions = options.CurrentValue;
-
-    public string GenerateAccessToken(ApplicationUser user, IEnumerable<string> roles)
+    public string GenerateAccessToken(ApplicationUser user, string role)
     {
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Role, string.Join(',', roles)),
+            new Claim(ClaimTypes.Role, role),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: jwtOptions.Issuer,
-            audience: jwtOptions.Audience,
+            issuer: options.Value.Issuer,
+            audience: options.Value.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(jwtOptions.AccessTokenExpirationMinutes),
+            expires: timeProvider
+                .GetUtcNow()
+                .DateTime.AddMinutes(options.Value.AccessTokenExpirationMinutes),
             signingCredentials: creds
         );
 
@@ -44,5 +45,29 @@ public class JwtService(IOptionsMonitor<JwtOptions> options) : IJwtService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public ClaimsPrincipal ValidateExpiredAccessToken(string accessToken)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var principal = tokenHandler.ValidateToken(
+            accessToken,
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = false,
+                ValidIssuer = options.Value.Issuer,
+                ValidAudience = options.Value.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(options.Value.SecretKey)
+                ),
+            },
+            out var _
+        );
+
+        return principal;
     }
 }

@@ -14,6 +14,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 
         return services;
     }
@@ -33,13 +34,13 @@ public static class DependencyInjectionExtensions
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services)
     {
-        services.AddRabbitMQ(cfg =>
-        {
-        },
-        (context, cfg) =>
-        {
-            cfg.UseMessageScope(context);
-        });
+        services.AddRabbitMQ(
+            cfg => { },
+            (context, cfg) =>
+            {
+                cfg.UseMessageScope(context);
+            }
+        );
 
         return services;
     }

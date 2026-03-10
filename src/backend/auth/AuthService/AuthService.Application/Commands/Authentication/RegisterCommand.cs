@@ -1,8 +1,10 @@
 ﻿using AuthService.Application.Errors;
+using AuthService.Application.Options;
 using AuthService.Application.Services.Abstractions;
 using AuthService.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Shared.Core.Exceptions;
 
 namespace AuthService.Application.Commands.Authentication;
@@ -14,7 +16,9 @@ public record RegisterCommandResponse(string AccessToken, string RefreshToken);
 
 public class RegisterCommandHandler(
     UserManager<ApplicationUser> userManager,
-    IJwtService jwtService
+    IJwtService jwtService,
+    IOptions<JwtOptions> options,
+    TimeProvider timeProvider
 ) : IRequestHandler<RegisterCommand, RegisterCommandResponse>
 {
     public async Task<RegisterCommandResponse> Handle(
@@ -49,11 +53,15 @@ public class RegisterCommandHandler(
         await userManager.UpdateAsync(user);
 
         var roles = await userManager.GetRolesAsync(user);
-        var accessToken = jwtService.GenerateAccessToken(user, roles);
+        var accessToken = jwtService.GenerateAccessToken(user, roles.FirstOrDefault());
         var refreshToken = jwtService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        user.RefreshTokenExpiryTime = timeProvider
+            .GetUtcNow()
+            .AddDays(options.Value.RefreshTokenExpirationDays)
+            .UtcDateTime;
+
         await userManager.UpdateAsync(user);
 
         return new RegisterCommandResponse(accessToken, refreshToken);
